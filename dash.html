@@ -28,6 +28,7 @@
 
   <script type="text/javascript">
     var animationHelper = AniJS.getHelper(); // Animation
+    // 대쉬 아이템 데이터
     var dashData = [
       {type: "d0001", title: "대쉬아이템1", w: 3, h: 3, minW: 3, maxW: 12, minH: 2, maxH: 5, locked: true, noResize: true, noMove: true}
       , {type: "d0002", title: "대쉬아이템2", w: 3, h: 3, minW: 2, maxW: 4, minH: 2, maxH: 6, locked: false, noResize: false, noMove: false}
@@ -72,11 +73,12 @@
     }
 
     loadGrid = function() {
+      // 개인 데이터
       saveData = [
-        {saved: true, id: "20230104122509777", type: "d0001", x: 0, y: 0, w: 3, h: 5, locked: true, noMove: true, noResize: true}
-        , {saved: true, id: "20230104122509784", type: "d0002", x: 3, y: 0, w: 2, h: 2}
-        , {saved: true, id: "20230104122509792", type: "d0003", x: 5, y: 0, w: 4, h: 5}
-        , {saved: true, id: "20230104122509795", type: "d0004", x: 3, y: 2, w: 2, h: 3}
+        {id: "20230104122509777", type: "d0001", x: 0, y: 0, w: 3, h: 5, locked: true, noMove: true, noResize: true}
+        , {id: "20230104122509784", type: "d0002", x: 3, y: 0, w: 2, h: 2}
+        , {id: "20230104122509792", type: "d0003", x: 5, y: 0, w: 4, h: 5}
+        , {id: "20230104122509795", type: "d0004", x: 3, y: 2, w: 2, h: 3}
       ];
       saveData.forEach((item, i) => {
         addItem(item);
@@ -111,7 +113,7 @@
     }
 
     addNewItem = function(tgt) {
-      addItem({type: tgt});
+      addItem({type: tgt, new: true});
     }
 
     /* ------------ Function End ------------ */
@@ -152,7 +154,7 @@
       for (let i = 0; i < items.length; i++) {
         items[i].el.setAttribute("id", items[i].id)
         items[i].el.setAttribute("gs-type", items[i].type);
-        items[i].el.setAttribute("data-anijs", "if: added, do: "+ ((!items[i]["saved"]) ? "swing animated" : "none") + ", after: holdAnimClass, on: $gridstack");
+        items[i].el.setAttribute("data-anijs", "if: added, do: "+ ((items[i]["new"]) ? "swing animated" : "none") + ", after: holdAnimClass, on: $gridstack");
       }
       AniJS.run();
       this.gridstackNotifier = AniJS.getNotifier("gridstack");
@@ -161,9 +163,7 @@
     });
 
     /* ------------ DashBoard Event End ------------ */
-    
     loadGrid();
-    
   </script>
 </body>
 </html>
