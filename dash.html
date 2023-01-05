@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>대시보드</title>
+
+  <link rel="stylesheet" href="./css/demo.css"/>
+  <link rel="stylesheet" href="https://anijs.github.io/lib/anicollection/anicollection.css" />
+  <link rel="stylesheet" href="./css/gridstack.min.css"/>
+  <script src="./js/jquery-1.9.1.min.js"></script>
+  <script src="./js/gridstack-all.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/AniJS/0.9.3/anijs.js"></script>
+</head>
+<body>
+  
+  <div class="container-fluid">
+    <a class="btn btn-primary" onClick="addNewItem('d0005')" href="#">Add Widget</a>
+    <a onClick="saveGrid()" class="btn btn-primary" href="#">Save</a>
+    <a onClick="loadGrid()" class="btn btn-primary" href="#">Load</a>
+    <a onClick="clearGrid()" class="btn btn-primary" href="#">Clear</a>
+    <textarea id="saved-data" cols="10" rows="1" readonly="readonly"></textarea>
+    <br/><br/>
+    <div class="grid-stack"></div>
+    
+  </div>
+
+  <script type="text/javascript">
+    var animationHelper = AniJS.getHelper(); // Animation
+    var dashData = [
+      {type: "d0001", title: "대쉬아이템1", w: 3, h: 3, minW: 3, maxW: 12, minH: 2, maxH: 5, locked: true, noResize: true, noMove: true}
+      , {type: "d0002", title: "대쉬아이템2", w: 3, h: 3, minW: 2, maxW: 4, minH: 2, maxH: 6, locked: false, noResize: false, noMove: false}
+      , {type: "d0003", title: "대쉬아이템3", w: 3, h: 3, minW: 3, maxW: 12, minH: 3, maxH: 5, locked: false, noResize: false, noMove: false}
+      , {type: "d0004", title: "대쉬아이템4", w: 5, h: 4, minW: 2, maxW: 12, minH: 3, maxH: 8, locked: false, noResize: false, noMove: false}
+      , {type: "d0005", title: "대쉬아이템5", w: 3, h: 3, minW: 2, maxW: 12, minH: 3, maxH: 8, locked: false, noResize: false, noMove: false}
+    ];
+    var saveData = null;
+
+    /* ------------ Function Start ------------ */
+
+    isNull = function(v) {
+        return typeof v === 'undefined' || v === null || v === "";
+    }
+
+    pad = function(str, max) {
+                str = str.toString();
+                return str.length < max ? pad("0" + str, max) : str;
+            };
+    uid = function() {
+      var d = new Date(); 
+      var dt = pad(d.getFullYear(), 4) + ""
+                  + pad((d.getMonth()+1), 2)  + ""
+                  + pad(d.getDate(), 2) + ""
+                  + pad(d.getHours(), 2) + ""
+                  + pad(d.getMinutes(), 2) + ""
+                  + pad(d.getSeconds(), 2) + ""
+                  + pad(d.getMilliseconds(), 3);
+      return dt;
+    }
+
+    setDefaultContent = function(item) {
+      var dItem = dashData.find(e => e.type === item.type);
+      item = $.extend({}, dItem, item);
+      var contentHtml = "<div class='dash-item-title'>";
+        contentHtml += "<span>" + item.title + "</span>";
+      contentHtml += (item.locked) ? "" : "<button onClick='grid.removeWidget(this.closest(\".grid-stack-item\"))'>X</button>";
+      contentHtml += "</div>";
+      contentHtml += "<br/>" + item.id;
+      item.content = contentHtml;
+      return item;
+    }
+
+    loadGrid = function() {
+      saveData = [
+        {saved: true, id: "20230104122509777", type: "d0001", x: 0, y: 0, w: 3, h: 5, locked: true, noMove: true, noResize: true}
+        , {saved: true, id: "20230104122509784", type: "d0002", x: 3, y: 0, w: 2, h: 2}
+        , {saved: true, id: "20230104122509792", type: "d0003", x: 5, y: 0, w: 4, h: 5}
+        , {saved: true, id: "20230104122509795", type: "d0004", x: 3, y: 2, w: 2, h: 3}
+      ];
+      saveData.forEach((item, i) => {
+        addItem(item);
+      });
+    }
+
+    saveGrid = function() {
+      saveData = grid.save();
+      document.querySelector("#saved-data").value = JSON.stringify(saveData, null, " ");
+      console.log("saved : " + saveData);
+    }
+
+    clearGrid = function() {
+      grid.removeAll();
+    }
+
+    addItem = function(item) {
+      item.id = (isNull(item.id)) ? uid() : item.id;
+      item = setDefaultContent(item);
+      grid.addWidget(item);
+      if($(".grid-stack-item[gs-type=" + item.type + "]").length == 1) {
+        var script = document.createElement('script');  
+        script.src = "/js/" + item.type + ".js";        
+        document.body.appendChild(script);
+        script.onload = function(){          
+          new Function("$('#"+item.id+"')."+item.type+"()")();
+        };
+      } else {
+        new Function("$('#"+item.id+"')."+item.type+"()")();
+      }
+      
+    }
+
+    addNewItem = function(tgt) {
+      addItem({type: tgt});
+    }
+
+    /* ------------ Function End ------------ */
+    
+    /* ------------ DashBoard Start ------------ */
+    var options = {
+        cellHeight: 140,
+        alwaysShowResizeHandle: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+        resizable: {
+            handles: "e, se, s, sw, w"
+        },
+        draggable: {
+            handle: ".dash-item-title"
+        }
+    };
+    var grid = GridStack.init(options);
+    /* ------------ DashBoard End ------------ */
+
+    /* ------------ DashBoard Event Start ------------ */
+    // 변경이 있을때 저장
+    grid.on("added removed change", function(e, items) {
+      if (!items) return;
+      let str = "";
+      items.forEach(function(item) { str += " (x,y)=" + item.x + "," + item.y; });
+      console.log(e.type + " " + items.length + " items:" + str );
+      saveGrid(); 
+    });
+
+    // 리사이즈 완료 이벤트
+    grid.on("resizestop", function(e, el) {
+      let width = parseInt(el.getAttribute("gs-w")) || 0;
+      console.log("resize done : " + width );
+    });
+
+    // 추가 완료 이벤트
+    grid.on("added", function(e, items) {
+      // add anijs data to gridstack item
+      for (let i = 0; i < items.length; i++) {
+        items[i].el.setAttribute("id", items[i].id)
+        items[i].el.setAttribute("gs-type", items[i].type);
+        items[i].el.setAttribute("data-anijs", "if: added, do: "+ ((!items[i]["saved"]) ? "swing animated" : "none") + ", after: holdAnimClass, on: $gridstack");
+      }
+      AniJS.run();
+      this.gridstackNotifier = AniJS.getNotifier("gridstack");
+      // fire added event!
+      this.gridstackNotifier.dispatchEvent("added");
+    });
+
+    /* ------------ DashBoard Event End ------------ */
+    
+    loadGrid();
+    
+  </script>
+</body>
+</html>
