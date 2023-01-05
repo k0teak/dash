@@ -1,0 +1,43 @@
+/* required file for gridstack to work */
+
+/* Optional styles for demos */
+html, body{height: 100%;padding:0px;margin:0px;}
+.container-fluid {
+  width:100%;
+  height:100%;
+  background-color: #EDF2F9;
+}
+.grid-stack {
+  overflow: hidden;
+}
+
+.grid-stack-item-content {
+  padding: 10px;
+  color: #2c3e50;
+  background-color: #fff;
+  border-radius: 0.375rem;
+  box-shadow: 0 7px 14px 0 rgba(65,69,88,0.1),0 3px 6px 0 rgba(0,0,0,0.07);
+}
+
+.grid-stack-item-content:hover {
+  box-shadow: 0 7px 14px rgba(65,69,88,0.25), 0 3px 6px rgba(0,0,0,0.22);
+}
+.grid-stack.grid-stack-nested {
+  background: none;
+  /* background-color: red; */
+  /* take entire space */
+  position: absolute;
+  inset: 0; /* TODO change top: if you have content in nested grid */
+}
+
+
+.grid-stack-placeholder>.placeholder-content{
+  background-color:rgba(0,0,0,0.03) !important;
+}
+
+.dash-item-title{float:left;width:100%;height:40px;padding-bottom: 5px;}
+.dash-item-title span{line-height:40px;padding:0px 10px;font-weight:bold;}
+.dash-item-title button{float:right;margin-top:5px;}
+.grid-stack-item:not(.ui-draggable-disabled) .dash-item-title{cursor:move;}
+
+.grid-stack-item-content{overflow-y: hidden !important;background-color: #fff;}
